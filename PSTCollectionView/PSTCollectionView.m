@@ -1754,7 +1754,6 @@ static void PSTCollectionViewCommonSetup(PSTCollectionView *_self) {
             [animations addObject:dic];
             PSTCollectionViewItemKey *newKey = [key copy];
             newAllVisibleView[newKey] = view;
-
         }
     }
     NSArray *allNewlyVisibleItems = [_layout layoutAttributesForElementsInRect:self.visibleBoundRects];
@@ -1782,7 +1781,10 @@ static void PSTCollectionViewCommonSetup(PSTCollectionView *_self) {
         [view applyLayoutAttributes:attr];
     };
 
-    [UIView animateWithDuration:.3 animations:^{
+    [UIView animateWithDuration:.3
+                          delay:0.0
+                        options:UIViewAnimationOptionLayoutSubviews
+                     animations:^{
         _collectionViewFlags.updatingLayout = YES;
 
         [CATransaction begin];
