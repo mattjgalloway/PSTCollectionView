@@ -1180,8 +1180,10 @@ static void PSTCollectionViewCommonSetup(PSTCollectionView *_self) {
                         atIndexPath:key.indexPath];
             }
 
-            layoutInterchangeData[key] = [NSDictionary dictionaryWithObjects:@[prevAttr, newAttr]
-                    forKeys:@[@"previousLayoutInfos", @"newLayoutInfos"]];
+            if (prevAttr && newAttr) {
+                layoutInterchangeData[key] = [NSDictionary dictionaryWithObjects:@[prevAttr, newAttr]
+                                                                         forKeys:@[@"previousLayoutInfos", @"newLayoutInfos"]];
+            }
         }
 
         for (PSTCollectionViewItemKey *key in [layoutInterchangeData keyEnumerator]) {
