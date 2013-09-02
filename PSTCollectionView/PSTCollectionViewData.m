@@ -22,7 +22,7 @@
 
  "<UICGPointKey: 0x11432d40>" = "<NSMutableIndexSet: 0x11432c60>[number of indexes: 9 (in 1 ranges), indexes: (0-8)]";
  "<UICGPointKey: 0xb94bf60>" = "<NSMutableIndexSet: 0x18dea7e0>[number of indexes: 11 (in 2 ranges), indexes: (6-15 17)]";
- 
+
  (lldb) p (CGPoint)[[[[[collectionView valueForKey:@"_collectionViewData"] valueForKey:@"_screenPageDict"] allKeys] objectAtIndex:0] point]
  (CGPoint) $11 = (x=15, y=159)
  (lldb) p (CGPoint)[[[[[collectionView valueForKey:@"_collectionViewData"] valueForKey:@"_screenPageDict"] allKeys] objectAtIndex:1] point]
@@ -62,11 +62,11 @@
 }
 
 - (void)dealloc {
-    if (_sectionItemCounts) free(_sectionItemCounts);
+    free(_sectionItemCounts);
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p numItems:%d numSections:%d>", NSStringFromClass([self class]), self, self.numberOfItems, self.numberOfSections];
+    return [NSString stringWithFormat:@"<%@: %p numItems:%d numSections:%d>", NSStringFromClass(self.class), self, self.numberOfItems, self.numberOfSections];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@
         _validLayoutRect = rect;
         // we only want cell layoutAttributes & supplementaryView layoutAttributes
         self.cachedLayoutAttributes = [[self.layout layoutAttributesForElementsInRect:rect] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(PSTCollectionViewLayoutAttributes *evaluatedObject, NSDictionary *bindings) {
-            return ([evaluatedObject isKindOfClass:[PSTCollectionViewLayoutAttributes class]] &&
+            return ([evaluatedObject isKindOfClass:PSTCollectionViewLayoutAttributes.class] &&
                     ([evaluatedObject isCell] ||
                             [evaluatedObject isSupplementaryView] ||
                             [evaluatedObject isDecorationView]));
@@ -106,20 +106,20 @@
 
 - (NSInteger)numberOfItemsBeforeSection:(NSInteger)section {
     [self validateItemCounts];
-    
+
     NSAssert(section < _numSections, @"request for number of items in section %d when there are only %d sections in the collection view", section, _numSections);
-    
+
     NSInteger returnCount = 0;
-    for (int i = 0; i < section-1; i++) {
+    for (int i = 0; i < section; i++) {
         returnCount += _sectionItemCounts[i];
     }
-    
+
     return returnCount;
 }
 
 - (NSInteger)numberOfItemsInSection:(NSInteger)section {
     [self validateItemCounts];
-    if (section > _numSections || section < 0) {
+    if (section >= _numSections || section < 0) {
         // In case of inconsistency returns the 'less harmful' amount of items. Throwing an exception here potentially
         // causes exceptions when data is consistent. Deleting sections is one of the parts sensitive to this.
         // All checks via assertions are done on CollectionView animation methods, specially 'endAnimations'.
@@ -145,9 +145,9 @@
 
 - (NSIndexPath *)indexPathForItemAtGlobalIndex:(NSInteger)index {
     [self validateItemCounts];
-    
+
     NSAssert(index < _numItems, @"request for index path for global index %d when there are only %d items in the collection view", index, _numItems);
-    
+
     NSInteger section = 0;
     NSInteger countItems = 0;
     for (section = 0; section < _numSections; section++) {
@@ -155,9 +155,9 @@
         if (countIncludingThisSection > index) break;
         countItems = countIncludingThisSection;
     }
-    
+
     NSInteger item = index - countItems;
-    
+
     return [NSIndexPath indexPathForItem:item inSection:section];
 }
 
@@ -203,6 +203,7 @@
         _numItems = 0;
         free(_sectionItemCounts);
         _sectionItemCounts = 0;
+        _collectionViewDataFlags.itemCountsAreValid = YES;
         return;
     }
     // allocate space
@@ -219,7 +220,7 @@
         _sectionItemCounts[i] = cellCount;
         _numItems += cellCount;
     }
-    
+
     _collectionViewDataFlags.itemCountsAreValid = YES;
 }
 

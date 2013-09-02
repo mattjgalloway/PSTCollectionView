@@ -34,11 +34,11 @@ typedef NS_ENUM(NSUInteger, PSTCollectionElementCategory) {
     PSTCollectionElementCategoryDecorationView
 };
 
-/**
- Replacement for UICollectionView for iOS4/5.
- Only supports a subset of the features of UICollectionView.
- e.g. animations won't be handled.
- */
+/// Define the `PSTCollectionViewDisableForwardToUICollectionViewSentinel` to disable the automatic forwarding to UICollectionView on iOS 6+. (Copy below line into your AppDelegate.m)
+//@interface PSTCollectionViewDisableForwardToUICollectionViewSentinel : NSObject @end @implementation PSTCollectionViewDisableForwardToUICollectionViewSentinel @end
+
+/// API-compatible replacement for UICollectionView.
+/// Works on iOS 4.3 upwards (including iOS 6).
 @interface PSTCollectionView : UIScrollView
 
 - (id)initWithFrame:(CGRect)frame collectionViewLayout:(PSTCollectionViewLayout *)layout; // the designated initializer
@@ -103,21 +103,13 @@ typedef NS_ENUM(NSUInteger, PSTCollectionElementCategory) {
 
 // These methods allow dynamic modification of the current set of items in the collection view
 - (void)insertSections:(NSIndexSet *)sections;
-
 - (void)deleteSections:(NSIndexSet *)sections;
-
 - (void)reloadSections:(NSIndexSet *)sections;
-
 - (void)moveSection:(NSInteger)section toSection:(NSInteger)newSection;
-
 - (void)insertItemsAtIndexPaths:(NSArray *)indexPaths;
-
 - (void)deleteItemsAtIndexPaths:(NSArray *)indexPaths;
-
 - (void)reloadItemsAtIndexPaths:(NSArray *)indexPaths;
-
 - (void)moveItemAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath;
-
 - (void)performBatchUpdates:(void (^)(void))updates completion:(void (^)(BOOL finished))completion; // allows multiple insert/delete/reload/move calls to be animated simultaneously. Nestable.
 
 @end
